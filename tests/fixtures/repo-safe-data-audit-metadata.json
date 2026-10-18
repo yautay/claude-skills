@@ -1,0 +1,16 @@
+[
+  {
+    "id": "1",
+    "path": "src/parser.py",
+    "extension": ".py",
+    "size_bytes": 1200,
+    "git_tracked": true
+  },
+  {
+    "id": "2",
+    "path": "reports/example-output.csv",
+    "extension": ".csv",
+    "size_bytes": 50000,
+    "git_tracked": false
+  }
+]

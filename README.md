@@ -6,6 +6,9 @@ Repo przechowuje oddzielne instrukcje dla każdego klienta i samodzielne paczki:
 claude/skills/git-clean/   # /git-clean w Claude Code
 codex/skills/git-clean/    # $git-clean w Codexie
 shared/git-clean/          # źródła wspólnych skryptów
+claude/skills/repo-safe-data-audit/ # /repo-safe-data-audit w Claude Code
+codex/skills/repo-safe-data-audit/  # $repo-safe-data-audit w Codexie
+shared/repo-safe-data-audit/        # kanoniczne instrukcje i helper lokalnego LLM
 tools/build_skills.py     # pakowanie do katalogów dostawców
 tests/                    # testy na tymczasowych repozytoriach
 ```
@@ -14,7 +17,34 @@ Nowy klient może dostać `<klient>/skills/git-clean/SKILL.md`. Skrypt pakujący
 odnajduje takie katalogi automatycznie. Każda paczka zawiera wszystkie skrypty;
 po instalacji nie zależy od katalogu `shared/` ani API drugiego dostawcy.
 
-## git-clean
+## repo-safe-data-audit
+
+Audyt prywatności repozytorium i lokalnie dostępnej historii Git: sekrety,
+identyfikujące dane, wyniki pracy i zależności narzędzi. Produkt to prywatny plik
+`IMPLEMENTATION-PLAN.md` zapisany **poza repo**, z dokładnymi zadaniami dla
+GPT-6.1 Sol medium. Wywołanie skilla niczego nie migruje, nie zmienia historii
+i nie publikuje danych. Ręczne odtworzenie remote z czystym pierwszym commitem
+jest jedną z planowanych opcji; stare kopie i powierzchnie hostingu wymagają
+osobnego rozliczenia. Plan obejmuje też codzienny LAN SFTP backup pięciu
+zweryfikowanych punktów odtworzenia i próbę przywrócenia.
+
+- Codex: `codex/skills/repo-safe-data-audit/`, wywołanie `$repo-safe-data-audit`.
+- Claude Code: `claude/skills/repo-safe-data-audit/`, `/repo-safe-data-audit`.
+- Źródło obu samodzielnych paczek: `shared/repo-safe-data-audit/`.
+- Instalacja: skopiuj całą paczkę do katalogu skilli klienta, np.
+  `.agents/skills/repo-safe-data-audit/` dla repozytoryjnego Codexa. Przy
+  aktualizacji kopii ponownie skopiuj całą paczkę. Nie instaluj samego SKILL.md.
+
+Opcjonalny `local_llm_review.py` pomaga oceniać wcześniej sprawdzone metadane
+ścieżek przez lokalny model. Nie zastępuje Gitleaks ani przeglądu treści.
+Wymaga jawnego adresu loopback, modelu, potwierdzenia lokalności i bezpiecznych
+wejść; wyłącza proxy/przekierowania, waliduje JSON i zapisuje sugestie poza Git.
+Nie uruchamia narzędzi modelu. Instrukcje oraz przykład użycia są w paczce,
+w `references/local-model-use.md`. Brak runtime'u nie blokuje pozostałego audytu.
+Przed użyciem prywatnych danych wyłącz szczegółowe logi i włącz redakcję treści
+w runtime. Nie zakładaj oszczędności ani wyższej jakości bez pomiarów.
+
+## git-clean — szczegóły
 
 Audyt gałęzi, stashy i worktree, plan sprzątania oraz synchronizacja z gałęzią
 domyślną. Rozpoznaje merge, patche po rebase i squash. Pokazuje pracę tylko

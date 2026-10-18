@@ -11,23 +11,31 @@ def main():
     parser.add_argument('--check', action='store_true')
     args = parser.parse_args()
     failures = []
-    sources = [p for p in sorted((ROOT / 'shared/git-clean').iterdir())
-               if p.suffix in ('.sh', '.ps1', '.py')]
-    providers = sorted(p for p in ROOT.iterdir() if (p / 'skills/git-clean/SKILL.md').is_file())
-    for provider in providers:
-        target = provider / 'skills/git-clean'
-        for source in sources:
-            data = source.read_bytes()
-            destination = target / source.name
-            if args.check:
-                if not destination.exists() or destination.read_bytes() != data:
-                    failures.append(str(destination.relative_to(ROOT)))
-            else:
-                destination.write_bytes(data)
+    packages = [
+        ('git-clean', 'shared/git-clean', ('claude', 'codex')),
+        ('repo-safe-data-audit', 'shared/repo-safe-data-audit', ('claude', 'codex')),
+    ]
+    built = 0
+    for skill, source_dir, providers in packages:
+        sources = [p for p in sorted((ROOT / source_dir).rglob('*'))
+                   if p.is_file() and p.suffix in ('.sh', '.ps1', '.py', '.md', '.yaml')
+                   and '__pycache__' not in p.parts]
+        targets = [ROOT / provider / 'skills' / skill for provider in providers
+                   if (ROOT / provider / 'skills' / skill / 'SKILL.md').is_file()]
+        for target in targets:
+            for source in sources:
+                destination = target / source.relative_to(ROOT / source_dir)
+                if args.check:
+                    if not destination.exists() or destination.read_bytes() != source.read_bytes():
+                        failures.append(str(destination.relative_to(ROOT)))
+                else:
+                    destination.parent.mkdir(parents=True, exist_ok=True)
+                    destination.write_bytes(source.read_bytes())
+            built += 1
     if failures:
         print('Outdated packages: ' + ', '.join(failures))
         return 1
-    print(('Checked' if args.check else 'Built') + f' {len(providers)} provider packages.')
+    print(('Checked' if args.check else 'Built') + f' {built} skill packages.')
     return 0
 
 

@@ -1,0 +1,10 @@
+[
+  {"id":"a01","path":"sources/scanned-contract.pdf","extension":"pdf","size_bytes":800000,"git_tracked":true},
+  {"id":"a02","path":"results/customer-analysis.csv","extension":"csv","size_bytes":5000,"git_tracked":true},
+  {"id":"a03","path":"notes/interview-transcript.md","extension":"md","size_bytes":4000,"git_tracked":true},
+  {"id":"a04","path":"private/screenshots/account.png","extension":"png","size_bytes":120000,"git_tracked":false},
+  {"id":"a05","path":"src/parser.py","extension":"py","size_bytes":1200,"git_tracked":true},
+  {"id":"a06","path":"tests/test_parser.py","extension":"py","size_bytes":2000,"git_tracked":true},
+  {"id":"a07","path":"config/defaults.json","extension":"json","size_bytes":800,"git_tracked":true},
+  {"id":"a08","path":"README.md","extension":"md","size_bytes":3000,"git_tracked":true}
+]

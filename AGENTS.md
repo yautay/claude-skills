@@ -4,6 +4,10 @@
   musi działać bez pozostałych katalogów tego repo.
 - Źródła skryptów git-clean: `shared/git-clean/`. Zmieniaj tutaj, potem uruchom
   `python tools/build_skills.py`. Kopie w paczkach są generowane.
+- Cały skill repo-safe-data-audit (instrukcja, referencje i helper) ma źródła
+  w `shared/repo-safe-data-audit/`. Obie paczki klientów są generowane tym samym
+  poleceniem. Raportów rzeczywistych audytów ani odpowiedzi modeli nie dodawaj
+  do tego repo; używaj prywatnego katalogu poza drzewami Git.
 - Weryfikacja: `python tools/build_skills.py --check` i
   `python -m unittest discover -s tests -v`.
 - Testy mutujące Git wykonuj wyłącznie w swoich tymczasowych repozytoriach.
