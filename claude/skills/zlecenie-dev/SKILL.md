@@ -172,7 +172,14 @@ Gdy sesja kończy turę:
    Commit scalenia ma format repo.
 4. **Widok:** `merged` z `mergedSha` i `mergedAt`, nowy wpis w dzienniku, `head`.
    Zależne batche z `pending` przechodzą na `ready`.
-5. **Kolejna sesja:** uruchom następną z kolejki, w granicach limitu.
+5. **Kolejna sesja:** uruchom następną z kolejki, w granicach limitu. Wznowienie
+   istniejącej sesji (`send_message`) działa zawsze. Nowej sesji aplikacja nie
+   pozwala uruchomić w turze wywołanej zdarzeniem (raport sesji, zadanie w tle).
+   Karta `own_initiative` gubi `source_branch` (worktree zostałby odbity od gałęzi
+   domyślnej), więc jej nie proponuj. Zapytaj właściciela przyciskiem „Startuj
+   B<NNN>” i uruchom sesję na jego słowo. Najlepiej na początku orkiestracji poproś
+   o zgodę „startuj automatycznie w ramach limitu”: wtedy przy pierwszej turze
+   właściciela startujesz od razu wszystko, co gotowe.
 6. **Odbiór ręczny:** gdy batch go wymaga, ustaw `blocked` z notatką „czeka na
    odbiór”. Poproś właściciela o odbiór z konkretną listą do kliknięcia i nie
    startuj zależnych batchy.
