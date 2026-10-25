@@ -4,6 +4,7 @@ Repo przechowuje oddzielne instrukcje dla każdego klienta i samodzielne paczki:
 
 ```text
 claude/skills/git-clean/   # /git-clean w Claude Code
+claude/skills/zlecenie-dev/ # /zlecenie-dev w Claude Code (tylko Claude)
 codex/skills/git-clean/    # $git-clean w Codexie
 shared/git-clean/          # źródła wspólnych skryptów
 claude/skills/repo-safe-data-audit/ # /repo-safe-data-audit w Claude Code
@@ -45,6 +46,26 @@ Przed użyciem prywatnych danych wyłącz szczegółowe logi i włącz redakcję
 w runtime. Nie zakładaj oszczędności ani wyższej jakości bez pomiarów.
 
 ## git-clean — szczegóły
+
+## zlecenie-dev
+
+Prowadzi zlecenie developerskie od promptu z wymaganiami do scalonej gałęzi:
+analiza bez implementacji i plan do akceptacji, batche spisane wg konwencji repo,
+segregacja na tory i fazy ze ścieżką krytyczną, orkiestracja osobnych sesji
+Claude Code (maks. 3 naraz, każda w swoim worktree i na modelu zaleconym w batchu),
+scalanie po jednej gałęzi do gałęzi docelowej i bramka końcowa z pełną suitą.
+Stan na żywo pokazuje interaktywny widok HTML (`assets/board.html`), publikowany
+jako Artifact z bazą: tory × fazy, kolejka scaleń, dziennik, tabela batchy.
+
+Tylko Claude Code (korzysta z narzędzi sesji, Artifact i ArtifactData desktopowej
+aplikacji). Wywołanie: `/zlecenie-dev <wymagania>`, `/zlecenie-dev status`,
+`/zlecenie-dev wznów` (po awarii: wznawia przerwane sesje z ich worktree).
+
+```powershell
+New-Item -ItemType Junction -Path "$env:USERPROFILE\.claude\skills\zlecenie-dev" -Target 'C:\dev\claude-skills\claude\skills\zlecenie-dev'
+```
+
+## git-clean
 
 Audyt gałęzi, stashy i worktree, plan sprzątania oraz synchronizacja z gałęzią
 domyślną. Rozpoznaje merge, patche po rebase i squash. Pokazuje pracę tylko
