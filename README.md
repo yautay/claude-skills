@@ -45,8 +45,6 @@ w `references/local-model-use.md`. Brak runtime'u nie blokuje pozostałego audyt
 Przed użyciem prywatnych danych wyłącz szczegółowe logi i włącz redakcję treści
 w runtime. Nie zakładaj oszczędności ani wyższej jakości bez pomiarów.
 
-## git-clean — szczegóły
-
 ## zlecenie-dev
 
 Prowadzi zlecenie developerskie od promptu z wymaganiami do scalonej gałęzi:
@@ -65,7 +63,7 @@ aplikacji). Wywołanie: `/zlecenie-dev <wymagania>`, `/zlecenie-dev status`,
 New-Item -ItemType Junction -Path "$env:USERPROFILE\.claude\skills\zlecenie-dev" -Target 'C:\dev\claude-skills\claude\skills\zlecenie-dev'
 ```
 
-## git-clean
+## git-clean — szczegóły
 
 Audyt gałęzi, stashy i worktree, plan sprzątania oraz synchronizacja z gałęzią
 domyślną. Rozpoznaje merge, patche po rebase i squash. Pokazuje pracę tylko
