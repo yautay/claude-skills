@@ -117,8 +117,9 @@ Pokaż jedną tabelę i szkic zależności:
 4. **Aktualizacje.** Aktualizuj na **każde** zdarzenie: start sesji, raport, scalenie,
    błąd, odbiór. Każdy zapis przypinaj `if_version` z ostatniego wyniku. Strony nie
    publikuj ponownie, tylko zapisuj dane. Nie aktualizuj „na zapas” timerem.
-5. **Link.** Podaj właścicielowi link i otwórz widok (`Artifact` `open`). Zaproponuj
-   kartę na tablicy „Rozgrzebane”, jeśli jej nie ma.
+5. **Link.** Podaj właścicielowi link i otwórz widok (`Artifact` `open`). Jeśli
+   właściciel prowadzi tablicę pracy (wskazaną w jego `CLAUDE.md`), zaproponuj na
+   niej kartę zlecenia, gdy jej nie ma.
 
 ## 5. Orkiestracja
 
@@ -147,11 +148,12 @@ weryfikacji; `prompt`):
 5. Środowisko worktree jest puste. Utwórz własne środowisko języka (np. `.venv` z
    instalacją editable **w worktree**, a nie z głównego checkoutu, i sprawdź, skąd
    importuje się pakiet) oraz zależności frontu.
-6. Baza do testów: własny jednorazowy kontener `pg-<plan>-b<NNN>` na porcie
-   `55<NNN>`, wskazany zmienną testów repo. Nigdy wspólny kontener dev. Usuń go na
-   końcu. Nie czytaj prawdziwego `.env`.
+6. Jeśli testy repo potrzebują bazy: własny jednorazowy kontener `pg-<plan>-b<NNN>`
+   na porcie `55<NNN>`, wskazany zmienną testów repo. Nigdy wspólny kontener dev.
+   Usuń go na końcu. Nie czytaj prawdziwego `.env`.
 7. Weryfikacja: szybkie bramki i testy celowane (pytest najwyżej `-n 4`), bez
-   pełnej suity.
+   pełnej suity. Jeśli właściciel zawęził weryfikację (np. „tylko celowane testy,
+   także w bramce końcowej”), zapisz to w briefie każdej sesji dosłownie.
 8. Commity w formacie repo, ze stopką `Co-Authored-By` właściwego modelu.
 9. Raport końcowy: gałąź i sha, zmienione pliki, wersja, bramki i testy z liczbami,
    budżety, odchylenia od batcha, pliki ryzykowne dla konfliktów.
@@ -165,7 +167,10 @@ Gdy sesja kończy turę:
    Ustaw w widoku `failed` albo `running` z notatką.
 3. **Scalenie.** Scalaj po jednej gałęzi naraz:
    `git merge --no-ff <gałąź>` na gałęzi docelowej, w głównym checkoucie, przy
-   czystym drzewie. Konflikty w plikach wspólnych rozwiązuj sam: wersja i changelog
+   czystym drzewie. Jeśli główny checkout ma cudze niezacommitowane zmiany albo
+   stoi na innej gałęzi, nie ruszaj go: załóż raz worktree integracyjny
+   (`git worktree add .claude/worktrees/<plan>-integration <docelowa>`) i scalaj
+   tam. Sesje startują wtedy z tej samej gałęzi docelowej. Konflikty w plikach wspólnych rozwiązuj sam: wersja i changelog
    (jedna sekcja na podbicie, numeracja wg kolejności scalania), eksport API i typy
    wygenerowane na świeżo, i18n łączone. Po scaleniu uruchom szybkie bramki
    i testy celowane dotkniętych modułów oraz sprawdź jedną głowę migracji.
@@ -178,8 +183,12 @@ Gdy sesja kończy turę:
    Karta `own_initiative` gubi `source_branch` (worktree zostałby odbity od gałęzi
    domyślnej), więc jej nie proponuj. Zapytaj właściciela przyciskiem „Startuj
    B<NNN>” i uruchom sesję na jego słowo. Najlepiej na początku orkiestracji poproś
-   o zgodę „startuj automatycznie w ramach limitu”: wtedy przy pierwszej turze
-   właściciela startujesz od razu wszystko, co gotowe.
+   o zgodę „startuj i scalaj automatycznie w ramach limitu”: wtedy scalasz od razu
+   po weryfikacji, a przy pierwszej turze właściciela startujesz wszystko, co
+   gotowe. Bramki decyzyjne planu, odbiory ręczne, push i PR zostają przy
+   właścicielu także z tą zgodą.
+   Po starcie sprawdź `get_session`: jeśli `effort` lub `model` różni się od
+   zleconego, powiedz o tym właścicielowi.
 6. **Odbiór ręczny:** gdy batch go wymaga, ustaw `blocked` z notatką „czeka na
    odbiór”. Poproś właściciela o odbiór z konkretną listą do kliknięcia i nie
    startuj zależnych batchy.
