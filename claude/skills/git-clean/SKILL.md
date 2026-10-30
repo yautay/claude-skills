@@ -64,9 +64,22 @@ Uruchom raport z `--sync dryrun` albo `--sync none`, z właściwym `--shell`.
 Wyniki są w `<git-common-dir>/git-clean/`, także w repo z worktree:
 `audit.txt`, `sync-dryrun.txt`, `sync-apply.txt`, `report.html`, `history/*.json`.
 
-Podaj ścieżkę `RAPORT HTML` i komendę do otwarcia w przeglądarce (`Start-Process -FilePath <ścieżka>` w PowerShellu, `open`/`xdg-open` w innych systemach). Jeśli masz narzędzie prezentacji pliku HTML, użyj go.
+`report.sh` sam szuka Pythona 3.8+ (`$GIT_CLEAN_PYTHON`, `python3`, `python`,
+`py -3`, `uv python find`, `.venv` repo, typowe instalacje Windows). Kod wyjścia 3
+oznacza brak interpretera: pokaż użytkownikowi listę „Sprawdzono” i zaproponuj
+`GIT_CLEAN_PYTHON`; nie uruchamiaj `report.py` ręcznie z innymi argumentami.
 
-Streść po polsku: świeżość remote, liczby A/B/C, pracę tylko lokalną,
+**Raport pokazuj zawsze jako pierwszy**, zanim napiszesz streszczenie, plan
+czy pytanie o zgodę — także po wykonaniu i po synchronizacji (nowy raport).
+Raport leży w `.git/`, którego panel plików aplikacji desktop nie otwiera, więc
+nie podawaj ścieżki jako linku do panelu. Jeśli masz wbudowaną przeglądarkę
+(np. `preview_start` z `url` albo `navigate`), otwórz w niej `RAPORT URL`
+(`file:///…`) od razu po `report.sh`, w następnym wywołaniu narzędzia. Pierwszą
+linią odpowiedzi jest informacja, że raport jest otwarty, plus gotowa komenda
+z linii `OTWÓRZ` w bloku kodu dla tej samej powłoki co `--shell`; bez
+wbudowanej przeglądarki ta komenda otwiera odpowiedź.
+
+Dopiero po raporcie streść po polsku: świeżość remote, liczby A/B/C, pracę tylko lokalną,
 konflikty, pominięte worktree i ostrzeżenia dotyczące hooków/podpisów.
 Graf pokazuje rzeczywistych rodziców commitów, a nie dowód równoważności
 treści po squash/rebase; do decyzji używaj klasyfikacji w tabelach.
@@ -79,7 +92,10 @@ pliki z trzeciego rodzica. Osobna zawartość indeksu nigdy nie jest „pustym�
 
 Plan: A — lokalne gałęzie, B — gałęzie remote, C — stashe, D — prune/gc,
 E — indywidualne decyzje (także ratowanie stashy). Pokaż tylko niepuste bloki.
-Zgoda na B jest osobna, ponieważ zmienia współdzielone repo. Pozycje E wymagają
+Zgoda na B jest osobna, ponieważ zmienia współdzielone repo. Gałęzie już usunięte
+na serwerze nie trafiają do B (oznaczone „usunięta na serwerze”); ich lokalny ślad
+czyści `git remote prune` z bloku D. Audyt obejmuje tylko `primary_remote`;
+gałęzie na innych remote'ach wymień użytkownikowi, ale nie planuj ich usunięcia. Pozycje E wymagają
 indywidualnego wyboru; utrata pracy tylko lokalnej wymaga wyraźnej zgody na jej wyrzucenie.
 Jeśli dostępne jest `AskUserQuestion`, użyj wyboru niepustych bloków i osobnych decyzji E; w przeciwnym razie zapytaj w czacie. Brak odpowiedzi nie jest zgodą.
 

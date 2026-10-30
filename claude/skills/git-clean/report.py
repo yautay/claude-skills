@@ -239,6 +239,26 @@ def git_command(*args: str, shell: str = "bash") -> str:
     return "git " + " ".join(quote_arg(arg, shell) for arg in args)
 
 
+def open_command(path: Path, shell: str) -> str:
+    """Komenda otwierająca raport w domyślnej przeglądarce, dla powłoki raportu."""
+    if shell == "powershell":
+        return f"Start-Process -FilePath {quote_arg(str(path), shell)}"
+    if os.name == "nt":  # Git Bash: explorer.exe przyjmuje ścieżkę windowsową
+        return f"explorer.exe {quote_arg(str(path), shell)}"
+    return ("open " if sys.platform == "darwin" else "xdg-open ") + quote_arg(str(path), shell)
+
+
+def gone_remote_names(a: dict) -> set[str]:
+    """Gałęzie remote już usunięte na serwerze (`git remote prune --dry-run`)."""
+    prefix = (a["remote"] or "origin") + "/"
+    names = set()
+    for line in a["stale_refs"]:
+        m = re.search(r"\[would prune\]\s+(\S+)", line)
+        if m and m.group(1).startswith(prefix):
+            names.add(m.group(1)[len(prefix):])
+    return names
+
+
 def translate_command(command: str, shell: str) -> str:
     if command.startswith('#') or shell == 'bash':
         return command
@@ -325,10 +345,13 @@ def classify(a: dict, protected: str, shell: str = "bash") -> dict:
     # Remote
     remote_name = a["remote"] or "origin"
     unchecked = 0
+    gone = gone_remote_names(a)
     for r in a["remote_rows"]:
+        r["gone"] = r["name"] in gone
         if r["ms"] == "UNCHECKED":
             unchecked += 1
-        if r["name"] == default or prot.search(r["name"]):
+        # Usunięta na serwerze: nie ma czego kasować, ślad sprząta `remote prune` (blok D).
+        if r["gone"] or r["name"] == default or prot.search(r["name"]):
             continue
         if r["ms"] in MERGED_LIKE + ("contained",) and a["net"] != "fresh":
             plan["E"].append({"text": f"{remote_name}/{r['name']} — przed usunięciem potrzebny świeży fetch",
@@ -708,7 +731,8 @@ def render(a: dict, cl: dict, sync: dict | None, diff: dict | None, sources: lis
         w('<details><summary>Pokaż wszystkie gałęzie remote</summary><div class="scroll"><table class="sortable"><thead><tr>'
           '<th>gałąź</th><th>merge do bazy</th><th>przed/za bazą</th><th>wiek [dni]</th><th>autor</th><th>lokalnie</th><th>ostatni commit</th></tr></thead><tbody>')
         for r in a["remote_rows"]:
-            w(f'<tr><td><code>{e(r["name"])}</code></td><td>{badge(r["ms"], MS_KIND.get(r["ms"], ""))}</td>'
+            w(f'<tr><td><code>{e(r["name"])}</code></td><td>{badge(r["ms"], MS_KIND.get(r["ms"], ""))}'
+              + (f' {badge("usunięta na serwerze")}' if r.get("gone") else "") + '</td>'
               f'<td class="num">{e(r["vs_base"])}</td><td class="num">{e(r["age"])}</td><td>{e(r["author"])}</td>'
               f'<td>{e(r["has_local"])}</td><td class="subj">{e(r["subject"])}</td></tr>')
         w("</tbody></table></div></details>")
@@ -782,6 +806,8 @@ def text_summary(a: dict, cl: dict, sync: dict | None, diff: dict | None, out: P
     net = {"fresh": "świeże", "failed": f"NIEAKTUALNE (fetch nieudany, dane sprzed {a['fetch_age_days'] or '?'} dni)",
            "skipped": f"z ostatniego fetcha ({a['fetch_age_days'] or '?'} dni)", "none": "brak remote'ów"}[a["net"]]
     w(f"RAPORT HTML: {out}")
+    w(f"RAPORT URL: {out.as_uri()}")
+    w(f"OTWÓRZ ({a['shell']}): {open_command(out, a['shell'])}")
     w(f"repo: {a['root']} | gałąź: {a['current']} | baza: {a['base']} | remote: {net}")
     lo = [b["name"] for b in a["local"] if "local_only" in b["cats"]]
     w(f"gałęzi lokalnych: {len(a['local'])} | do usunięcia A: {len(plan['A'])} | remote B: {len(plan['B'])} | "
